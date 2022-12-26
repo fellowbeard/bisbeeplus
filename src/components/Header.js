@@ -1,42 +1,124 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+// import { auth, provider } from "../firebase";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { selectUserName, selectUserPhoto, setUserLoginDetails, setSignOutState } from "../features/user/userSlice";
 
 function Header() {
+  const provider = new GoogleAuthProvider();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const userName = useSelector(selectUserName);
+  const userPhoto = useSelector(selectUserPhoto);
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setUser(user);
+        navigate.pushState("/home");
+      }
+    });
+  }, [userName]);
+
+  const auth = getAuth();
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      const setUser = result.user;
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.customData.email;
+      const credential = GoogleAuthProvider.credentialFromError(error);
+    });
+
+  // const handleAuth = () => {
+  //   auth
+  //     .signInWithPopup(provider)
+  //     .then((result) => {
+  //       setUser(result.user);
+  //     })
+  //     .catch((error) => {
+  //       alert(error.message);
+  //     });
+  // };
+
+  const setUser = (user) => {
+    dispatch(setUserLoginDetails)({
+      name: user.displayName,
+      email: user.email,
+      photo: user.photoURL,
+    });
+  };
   return (
     <Nav>
-      <Logo src="/images/logo.svg" />
+      <Logo src="/images/logo.svg" alt="Disney+" />
+      {/* 
+      {!userName ? (
+        <Login onClick={getAuth}>Login</Login>
+      ) : (
+        <> */}
       <NavMenu>
-        <a>
-          <img src="/images/home-icon.svg" alt="" />
+        <a href="/home">
+          <img src="/images/home-icon.svg" alt="HOME" />
           <span>HOME</span>
         </a>
         <a>
-          <img src="/images/search-icon.svg" alt="" />
+          <img src="/images/search-icon.svg" alt="SEARCH" />
           <span>SEARCH</span>
         </a>
         <a>
-          <img src="/images/watchlist-icon.svg" alt="" />
+          <img src="/images/watchlist-icon.svg" alt="WATCHLIST" />
           <span>WATCHLIST</span>
         </a>
         <a>
-          <img src="/images/original-icon.svg" alt="" />
+          <img src="/images/original-icon.svg" alt="ORIGINALS" />
           <span>ORIGINALS</span>
         </a>
         <a>
-          <img src="/images/movie-icon.svg" alt="" />
+          <img src="/images/movie-icon.svg" alt="MOVIES" />
           <span>MOVIES</span>
         </a>
         <a>
-          <img src="/images/series-icon.svg" alt="" />
+          <img src="/images/series-icon.svg" alt="SERIES" />
           <span>SERIES</span>
         </a>
       </NavMenu>
-      <UserImg src="/meicon.jpg" />
+      {/* <SignOut> */}
+      <UserImg src={userPhoto} alt={userName} />
+      <Login onClick={getAuth}>Login</Login>
+      {/* <DropDown>
+              <span onClick={handleAuth}>Sign out</span>
+            </DropDown>
+          </SignOut> */}
+      {/* </>
+      )} */}
     </Nav>
   );
 }
 
 export default Header;
+
+const Login = styled.a`
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px 16px;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  border: 1px solid #f9f9f9;
+  border-radius: 4px;
+  transition: all 0.2s ease 0s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f9f9f9;
+    color: #000;
+    border-color: transparent;
+  }
+`;
 
 const Nav = styled.div`
   height: 70px;
@@ -98,8 +180,5 @@ const NavMenu = styled.div`
 `;
 
 const UserImg = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  cursor: pointer;
+  height: 100%;
 `;
