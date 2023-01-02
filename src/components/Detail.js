@@ -1,142 +1,199 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import db from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 
-function Detail() {
+const Detail = () => {
+  const { id } = useParams();
+  const [detailData, setDetailData] = useState({});
+
+  const fetchMovie = async (ID) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "movies"));
+      querySnapshot.forEach((doc) => {
+        if (doc.id === ID) {
+          return setDetailData(doc.data());
+        }
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchMovie(id);
+
+    return () => {
+      setDetailData({});
+    };
+  }, [id]);
+
   return (
     <Container>
       <Background>
-        <img
-          src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg"
-          alt=""
-        />
+        <img src={detailData.backgroundImg} alt="" />
       </Background>
-      <ImageTitle>
-        <img
-          src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78"
-          alt=""
-        />
-      </ImageTitle>
-      <Controls>
-        <PlayButton>
-          <img src="/images/play-icon-black.png" alt="" />
-          <span>PLAY</span>
-        </PlayButton>
-        <TrailerButton>
-          <img src="/images/play-icon-white.png" alt="" />
-          <span>TRAILER</span>
-        </TrailerButton>
-        <AddButton>
-          <span>+</span>
-        </AddButton>
-        <GroupWatchButton>
-          <img src="/images/group-icon.png" alt="" />
-        </GroupWatchButton>
-      </Controls>
-      <SubTitle>2018 - 7m Family, Fantasy, Kids, Animation</SubTitle>
-      <Description>A Chinese mom who's sad when her grown son leaves.</Description>
+      <ImgTitle>
+        <img src={detailData.titleImg} alt="" />
+      </ImgTitle>
+      <ContentMedta>
+        <Controls>
+          <Player>
+            <img src="/images/play-icon-black.png" alt="" />
+            <span>Play</span>
+          </Player>
+          <Trailer>
+            <img src="/images/play-icon-white.png" alt="" />
+            <span>Trailer</span>
+          </Trailer>
+          <AddList>
+            <span />
+            <span />
+          </AddList>
+          <GroupWatch>
+            <div>
+              <img src="/images/group-icon.png" alt="" />
+            </div>
+          </GroupWatch>
+        </Controls>
+        <SubTitle>{detailData.title}</SubTitle>
+        <Description>{detailData.description}</Description>
+      </ContentMedta>
     </Container>
   );
-}
-
-export default Detail;
-
+};
 const Container = styled.div`
-  min-height: calc(100vh-250px);
-  padding: 0 calc(3.5vw + 5px);
   position: relative;
-  overflow: hidden;
+  min-height: calc(100vh - 250px);
+  overflow-x: hidden;
   display: block;
   top: 72px;
+  padding: 0 calc(3.5vw + 5px);
 `;
-
 const Background = styled.div`
   position: fixed;
-  top: 0;
   left: 0;
-  bottom: 0;
+  top: 0;
   right: 0;
-  opacity: 0.8;
+  opacity: 0.7;
   z-index: -1;
 
   img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 100vw;
+    height: 100vh;
+
+    @media (max-width: 768px) {
+      width: initial;
+    }
   }
 `;
-
-const ImageTitle = styled.div`
-  height: 30vh;
+const ImgTitle = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin: 0 auto;
+  height: 30vw;
   min-height: 170px;
-  width: 35vx;
-  min-width: 200px;
+  padding-bottom: 24px;
+  width: 100%;
 
   img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    max-width: 600px;
+    min-width: 200px;
+    width: 35vw;
   }
+`;
+const ContentMedta = styled.div`
+  max-width: 874px;
 `;
 
 const Controls = styled.div`
-  display: flex;
   align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 24px 0;
+  min-height: 56px;
 `;
 
-const PlayButton = styled.button`
+const Player = styled.button`
   font-size: 15px;
-  margin: 0px 22px 0px 0px;
-  padding: 0px 24px;
+  margin: 0 22px 0 0;
+  padding: 0 24px;
   height: 56px;
-  border-radius: 4px;
   cursor: pointer;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   letter-spacing: 1.8px;
   text-align: center;
   text-transform: uppercase;
-  background: rgb (249, 249, 249);
+  background: rgb(249, 249, 249);
   border: none;
-  color: rgb(0, 0, 0);
-
+  transition: all 200ms ease-in-out;
+  img {
+    width: 32px;
+  }
   &:hover {
     background: rgb(198, 198, 198);
   }
+
+  @media (max-width: 768px) {
+    height: 45px;
+    padding: 0 12px;
+    font-size: 12px;
+    margin: 0 10px 0 0;
+
+    img {
+      width: 25px;
+    }
+  }
 `;
-const TrailerButton = styled(PlayButton)`
+const Trailer = styled(Player)`
+  // grabbing all styles of Player
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgb(249, 249, 249);
   color: rgb(249, 249, 249);
+  transition: all 200ms ease-in-out;
 `;
-const AddButton = styled.button`
-  width: 44px;
-  height: 44px;
+const AddList = styled.div`
   margin-right: 16px;
-  diplay: flex;
-  align-items: center;
+  height: 44px;
+  width: 44px;
+  display: flex;
   justify-content: center;
-  border-radius: 50%;
-  border: 2px solid white;
+  align-items: center;
   background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  border: 1px solid white;
   cursor: pointer;
 
   span {
-    font-size: 30px;
-    color: white;
+    background-color: rgb(249, 249, 249);
+    display: inline-block;
+
+    &:first-child {
+      height: 2px;
+      transform: translate(1px, 0px) rotate(0deg);
+      width: 16px;
+    }
+    &:nth-child(2) {
+      height: 16px;
+      transform: translateX(-8px) rotate(0deg);
+      width: 2px;
+    }
   }
 `;
-
-const GroupWatchButton = styled.div`
+const GroupWatch = styled.div`
   height: 44px;
   width: 44px;
   border-radius: 50%;
-  border: 2px solid white;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.6);
+  background: #fff;
 
   div {
     height: 40px;
@@ -149,16 +206,24 @@ const GroupWatchButton = styled.div`
     }
   }
 `;
-
 const SubTitle = styled.div`
   color: rgb(249, 249, 249);
   font-size: 15px;
   min-height: 20px;
-  margin-top: 26px;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 `;
 const Description = styled.div`
   line-height: 1.4;
   font-size: 20px;
-  margin-top: 16px;
+  padding: 16px 0;
   color: rgb(249, 249, 249);
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 `;
+
+export default Detail;

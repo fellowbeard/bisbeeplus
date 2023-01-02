@@ -5,10 +5,12 @@ import Originals from "./Originals";
 import Recommends from "./Recommends";
 import Trending from "./Trending";
 import Viewers from "./Viewers";
+
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import database from "../firebase";
-import { doc, onSnapshot, collection, query, where } from "firebase/firestore";
+import db from "../firebase";
+// import { doc, onSnapshot, collection, query, where } from "firebase/firestore";
+
 import { setMovies } from "../features/movie/movieSlice";
 import { selectUserName } from "../features/user/userSlice";
 
@@ -21,8 +23,7 @@ const Home = (props) => {
   let trending = [];
 
   useEffect(() => {
-    console.log("hello");
-    database.collection("movies").onSnapshot((snapshot) => {
+    db.collection("movies").onSnapshot((snapshot) => {
       snapshot.docs.map((doc) => {
         console.log(recommends);
         switch (doc.data().type) {

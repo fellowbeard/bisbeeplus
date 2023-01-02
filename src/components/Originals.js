@@ -1,47 +1,26 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-// import { useSelector } from "react-redux";
-// import { selectRecommend } from "../features/movie/movieSlice";
+import { useSelector } from "react-redux";
+import { selectOriginal } from "../features/movie/movieSlice";
 
 const Originals = () => {
-  // const movies = useSelector(selectRecommend);
-  // console.log(movies, ":🛢️");
+  const movies = useSelector(selectOriginal);
+
   return (
     <Container>
       <h4>Originals</h4>
       <Content>
-        <Wrap>
-          <Link to="/">
-            <img
-              src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/6EA416AD3B15FCC1BADC817A932A57FFF707556DB2233FFCB4CFEB7C8EEDE23C/scale?width=400&aspectRatio=1.78&format=jpeg"
-              alt=""
-            />
-          </Link>
-        </Wrap>
-        <Wrap>
-          <Link to="/">
-            <img
-              src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/6EA416AD3B15FCC1BADC817A932A57FFF707556DB2233FFCB4CFEB7C8EEDE23C/scale?width=400&aspectRatio=1.78&format=jpeg"
-              alt=""
-            />
-          </Link>
-        </Wrap>
-        <Wrap>
-          <Link to="/">
-            <img
-              src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/6EA416AD3B15FCC1BADC817A932A57FFF707556DB2233FFCB4CFEB7C8EEDE23C/scale?width=400&aspectRatio=1.78&format=jpeg"
-              alt=""
-            />
-          </Link>
-        </Wrap>
-        <Wrap>
-          <Link to="/">
-            <img
-              src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/6EA416AD3B15FCC1BADC817A932A57FFF707556DB2233FFCB4CFEB7C8EEDE23C/scale?width=400&aspectRatio=1.78&format=jpeg"
-              alt=""
-            />
-          </Link>
-        </Wrap>
+        {movies &&
+          movies.map((movie, key) => {
+            return (
+              <Wrap key={key}>
+                {movie.id}
+                <Link to={"/detail/" + movie.id}>
+                  <img src={movie.cardImg} alt={movie.title} />
+                </Link>
+              </Wrap>
+            );
+          })}
       </Content>
     </Container>
   );
@@ -52,16 +31,15 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  display: grid
+  display: grid;
   grid-gap: 25px;
   gap: 25px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 
-  @media (max-width: 768px) {
+  @media only screen and (max-width: 768px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
   }
-  `;
+`;
 
 const Wrap = styled.div`
   padding-top: 56.25%;
@@ -72,18 +50,19 @@ const Wrap = styled.div`
   position: relative;
   transition: all 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 0s;
   border: 3px solid rgba(249, 249, 249, 0.1);
+
   img {
     inset: 0px;
     display: block;
     height: 100%;
+    width: 100%;
     object-fit: cover;
-    opacity: 1;
     position: absolute;
     transition: opacity 500ms ease-in-out 0s;
-    width: 100%;
     z-index: 1;
     top: 0;
   }
+
   &:hover {
     box-shadow: rgb(0 0 0 / 80%) 0px 40px 58px -16px, rgb(0 0 0 / 72%) 0px 30px 22px -10px;
     transform: scale(1.05);
